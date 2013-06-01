@@ -4,6 +4,21 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#define ITER4(a) a a a a
+#define ITER16(a)                               \
+    ITER4(a) ITER4(a) ITER4(a) ITER4(a) 
+
+#define ITER32(a)                               \
+    ITER4(a) ITER4(a) ITER4(a) ITER4(a)         \
+    ITER4(a) ITER4(a) ITER4(a) ITER4(a) 
+
+#define ITER64(a)                               \
+    ITER32(a) ITER32(a)
+
+#define HAS_LMEM (1<<0)
+#define INIT_INDEX (1<<1)
+#define THROUGHPUT (1<<2)
+
 #define  LOG_TAG    "libclminibench"
 #define  LOGI(...)  __android_log_print(ANDROID_LOG_INFO,LOG_TAG,__VA_ARGS__)
 #define  LOGE(...)  __android_log_print(ANDROID_LOG_ERROR,LOG_TAG,__VA_ARGS__)

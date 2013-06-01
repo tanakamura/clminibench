@@ -212,8 +212,8 @@ static const char float1_read_kernel[] =
             int gid = get_group_id(0);
             int lid = get_local_id(0);
             __global float *in = r + per_group_size * gid + lid;
-            for (int i=0; i<nloop; i++) {
-                v += in[item_step * i];
+            for (int i=0; i<nloop; ) {
+                ITER64(v += in[item_step * (i++)];);
             }
             *r = v;
         });
@@ -226,13 +226,13 @@ float1_read_run(struct bench_result *r,
 }
 
 static const char float4_read_kernel[] = 
-    K(void __kernel f(__global float4 *data, int nloop, __global float4 *r, int per_group_size, int item_step) {
+    K(void __kernel f(__global float4 *data, unsigned int nloop, __global float4 *r, int per_group_size, int item_step) {
             float4 v = 0;
             int gid = get_group_id(0);
             int lid = get_local_id(0);
             __global float4 *in = r + per_group_size * gid + lid;
-            for (int i=0; i<nloop; i++) {
-                v += in[item_step * i];
+            for (int i=0; i<nloop; ) {
+                ITER64(v += in[item_step * (i++)];);
             }
             *r = v;
         });

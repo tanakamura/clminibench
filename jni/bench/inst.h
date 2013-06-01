@@ -1,18 +1,3 @@
-#define ITER4(a) a a a a
-#define ITER16(a)                               \
-    ITER4(a) ITER4(a) ITER4(a) ITER4(a) 
-
-
-#define ITER32(a)                               \
-    ITER4(a) ITER4(a) ITER4(a) ITER4(a)         \
-    ITER4(a) ITER4(a) ITER4(a) ITER4(a) 
-
-#define ITER64(a)                               \
-    ITER32(a) ITER32(a)
-
-#define HAS_LMEM (1<<0)
-#define INIT_INDEX (1<<1)
-#define THROUGHPUT (1<<2)
 
 static void
 inst_latency_run(struct bench_result *r,
