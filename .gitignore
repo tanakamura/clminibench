@@ -1,0 +1,12 @@
+Makefile
+*.cache
+*.exe
+*.ilk
+*.pdb
+*.suo
+*.cmake
+CMakeCache.txt
+CMakeFiles
+obj
+libs
+bin

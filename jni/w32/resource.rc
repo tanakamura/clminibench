@@ -1,0 +1,19 @@
+#include "resource.h"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDC_MAINMENU MENU 
+BEGIN
+    POPUP "ファイル(&F)"
+    BEGIN
+        MENUITEM "開始(&S)",                      IDM_START
+        MENUITEM "アプリケーションの終了(&X)",             IDM_EXIT
+    END
+    POPUP "ヘルプ(&H)"
+    BEGIN
+        MENUITEM "バージョン情報(&A)...",              IDM_ABOUT
+    END
+END
