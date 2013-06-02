@@ -25,13 +25,13 @@
 static struct clinst_bench benches[BENCH_NUM];
 
 static const char * const eval_message[] = {
-    "ã¯ã‚„ã„ã‚ˆ",
-    "ã‚ã£ã¡ã‚ƒã¯ã‚„ã„ã‚ˆ",
-    "ã™ã£ã”ã„ã¯ã‚„ã„ã‚ˆ",
-    "ã‹ãªã‚Šã¯ã‚„ã„ã‚ˆ",
-    "ã‚ã£ã½ã†ã¯ã‚„ã„ã‚ˆ",
-    "ã¨ã¦ã‚‚ã¯ã‚„ã„ã‚ˆ",
-    "ãŠãã„",
+    "‚Í‚â‚¢‚æ",
+    "‚ß‚Á‚¿‚á‚Í‚â‚¢‚æ",
+    "‚·‚Á‚²‚¢‚Í‚â‚¢‚æ",
+    "‚©‚È‚è‚Í‚â‚¢‚æ",
+    "‚ß‚Á‚Û‚¤‚Í‚â‚¢‚æ",
+    "‚Æ‚Ä‚à‚Í‚â‚¢‚æ",
+    "‚¨‚»‚¢",
 };
 
 
@@ -43,8 +43,18 @@ int
 clinst_bench_init_context(struct clinst_bench_context *ctxt,
                           cl_device_id dev)
 {
+    cl_platform_id plat;
+    size_t sz;
+    cl_context_properties cps[3];
+
+    clGetDeviceInfo(dev, CL_DEVICE_PLATFORM, sizeof(plat), &plat, &sz);
+
+    cps[0] = CL_CONTEXT_PLATFORM;
+    cps[1] = (cl_context_properties)plat;
+    cps[2] = 0;
+
     ctxt->dev = dev;
-    ctxt->ctxt = clCreateContext(NULL, 1, &dev, NULL, NULL, NULL);
+    ctxt->ctxt = clCreateContext(cps, 1, &dev, NULL, NULL, NULL);
     ctxt->queue = clCreateCommandQueue(ctxt->ctxt, dev, 0, NULL);
 
     return 0;
@@ -248,7 +258,7 @@ clinst_bench_init(void)
     INIT_BENCH(BENCH_ENQUEUE_KERNEL_LATENCY,
                RESULT_TYPE_FLOAT,
                "enqueue kernel latency",
-               "ãƒ¯ãƒ¼ã‚¯ã‚¢ã‚¤ãƒ†ãƒ ä¸€å€‹èµ·å‹•ã™ã‚‹æ™‚é–“ã¯ã‹ã‚Šã¾ã™ã€‚ã¿ã˜ã‹ã„ã»ã©ã‚ˆã„ã§ã™",
+               "ƒ[ƒNƒAƒCƒeƒ€ˆêŒÂ‹N“®‚·‚éŠÔ‚Í‚©‚è‚Ü‚·B‚İ‚¶‚©‚¢‚Ù‚Ç‚æ‚¢‚Å‚·",
                "usec",
                kernel_latency_run,
                valid,
@@ -257,7 +267,7 @@ clinst_bench_init(void)
     INIT_BENCH(BENCH_ENQUEUE_MEMREAD_LATENCY,
                RESULT_TYPE_FLOAT,
                "enqueue memread latency",
-               "1byte clEnqueueReadBufferã™ã‚‹æ™‚é–“ã¯ã‹ã‚Šã¾ã™ã€‚ã¿ã˜ã‹ã„ã»ã©ã‚ˆã„ã§ã™ã­",
+               "1byte clEnqueueReadBuffer‚·‚éŠÔ‚Í‚©‚è‚Ü‚·B‚İ‚¶‚©‚¢‚Ù‚Ç‚æ‚¢‚Å‚·‚Ë",
                "usec",
                memread_latency_run,
                valid,
@@ -266,7 +276,7 @@ clinst_bench_init(void)
     INIT_BENCH(BENCH_ENQUEUE_MEMWRITE_LATENCY,
                RESULT_TYPE_FLOAT,
                "enqueue memwrite latency",
-               "1byte clEnqueueWriteBufferã™ã‚‹æ™‚é–“ã¯ã‹ã‚Šã¾ã™ã€‚ã¿ã˜ã‹ã„ã»ã©ã‚ˆã„ã§ã™ã­",
+               "1byte clEnqueueWriteBuffer‚·‚éŠÔ‚Í‚©‚è‚Ü‚·B‚İ‚¶‚©‚¢‚Ù‚Ç‚æ‚¢‚Å‚·‚Ë",
                "usec",
                memwrite_latency_run,
                valid,
@@ -284,7 +294,7 @@ clinst_bench_init(void)
     INIT_BENCH(BENCH_ENQUEUE_MEMREAD_BANDWIDTH,
                RESULT_TYPE_FLOAT,
                "memread bandwidth",
-               "clEnqueueReadMemoryã®bandwidthã‚’ã¯ã‹ã‚Šã¾ã™ã€‚CL_ALLOC_HOSTMEMORYãŒä½¿ãˆã‚‹ç’°å¢ƒã§ã¯ãã£ã¡ä½¿ã£ã¦ã­ã€‚",
+               "clEnqueueReadMemory‚Ìbandwidth‚ğ‚Í‚©‚è‚Ü‚·BCL_ALLOC_HOSTMEMORY‚ªg‚¦‚éŠÂ‹«‚Å‚Í‚»‚Á‚¿g‚Á‚Ä‚ËB",
                "MB/s",
                memread_bandwidth_run,
                valid,
@@ -293,7 +303,7 @@ clinst_bench_init(void)
     INIT_BENCH(BENCH_ENQUEUE_MEMWRITE_BANDWIDTH,
                RESULT_TYPE_FLOAT,
                "memwrite bandwidth",
-               "clEnqueueWriteMemoryã®bandwidthã‚’ã¯ã‹ã‚Šã¾ã™ã€‚CL_ALLOC_HOSTMEMORYãŒä½¿ãˆã‚‹ç’°å¢ƒã§ã¯ãã£ã¡ä½¿ã£ã¦ã­ã€‚",
+               "clEnqueueWriteMemory‚Ìbandwidth‚ğ‚Í‚©‚è‚Ü‚·BCL_ALLOC_HOSTMEMORY‚ªg‚¦‚éŠÂ‹«‚Å‚Í‚»‚Á‚¿g‚Á‚Ä‚ËB",
                "MB/s",
                memwrite_bandwidth_run,
                valid,
@@ -302,7 +312,7 @@ clinst_bench_init(void)
     INIT_BENCH(BENCH_FLOAT1_MEMREAD_BANDWIDTH,
                RESULT_TYPE_FLOAT,
                "global float1 read bandwidth",
-               "global memory ã‹ã‚‰ float1 èª­ã‚€bandwidthã‚’ã¯ã‹ã‚Šã¾ã™ã€‚",
+               "global memory ‚©‚ç float1 “Ç‚Şbandwidth‚ğ‚Í‚©‚è‚Ü‚·B",
                "GB/s",
                float1_read_run,
                valid,
@@ -311,7 +321,7 @@ clinst_bench_init(void)
     INIT_BENCH(BENCH_FLOAT4_MEMREAD_BANDWIDTH,
                RESULT_TYPE_FLOAT,
                "global float4 read bandwidth",
-               "global memory ã‹ã‚‰ float4 èª­ã‚€bandwidthã‚’ã¯ã‹ã‚Šã¾ã™ã€‚",
+               "global memory ‚©‚ç float4 “Ç‚Şbandwidth‚ğ‚Í‚©‚è‚Ü‚·B",
                "GB/s",
                float4_read_run,
                valid,
@@ -321,7 +331,7 @@ clinst_bench_init(void)
     INIT_BENCH(BENCH_FLOAT1_ADD_LATENCY,
                RESULT_TYPE_FLOAT,
                "float1 add latency",
-               "float1 ã®åŠ ç®—ãƒ¬ã‚¤ãƒ†ãƒ³ã‚·ã‚’è¦‹ã¾ã—ã‚‡ã†",
+               "float1 ‚Ì‰ÁZƒŒƒCƒeƒ“ƒV‚ğŒ©‚Ü‚µ‚å‚¤",
                "clk",
                float1_add_latency_run,
                valid,
@@ -331,7 +341,7 @@ clinst_bench_init(void)
     INIT_BENCH(BENCH_FLOAT2_ADD_LATENCY,
                RESULT_TYPE_FLOAT,
                "float2 add latency",
-               "float2 ã®åŠ ç®—ãƒ¬ã‚¤ãƒ†ãƒ³ã‚·ã‚’è¦‹ã¾ã—ã‚‡ã†",
+               "float2 ‚Ì‰ÁZƒŒƒCƒeƒ“ƒV‚ğŒ©‚Ü‚µ‚å‚¤",
                "clk",
                float2_add_latency_run,
                valid,
@@ -341,7 +351,7 @@ clinst_bench_init(void)
     INIT_BENCH(BENCH_FLOAT4_ADD_LATENCY,
                RESULT_TYPE_FLOAT,
                "float4 add latency",
-               "float4 ã®åŠ ç®—ãƒ¬ã‚¤ãƒ†ãƒ³ã‚·ã‚’è¦‹ã¾ã—ã‚‡ã†",
+               "float4 ‚Ì‰ÁZƒŒƒCƒeƒ“ƒV‚ğŒ©‚Ü‚µ‚å‚¤",
                "clk",
                float4_add_latency_run,
                valid,
@@ -351,7 +361,7 @@ clinst_bench_init(void)
     INIT_BENCH(BENCH_INT1_ADD_LATENCY,
                RESULT_TYPE_FLOAT,
                "int1 add latency",
-               "int1 ã®åŠ ç®—ãƒ¬ã‚¤ãƒ†ãƒ³ã‚·ã‚’è¦‹ã¾ã—ã‚‡ã†",
+               "int1 ‚Ì‰ÁZƒŒƒCƒeƒ“ƒV‚ğŒ©‚Ü‚µ‚å‚¤",
                "clk",
                int1_add_latency_run,
                valid,
@@ -361,7 +371,7 @@ clinst_bench_init(void)
     INIT_BENCH(BENCH_INT4_ADD_LATENCY,
                RESULT_TYPE_FLOAT,
                "int4 add latency",
-               "int4 ã®åŠ ç®—ãƒ¬ã‚¤ãƒ†ãƒ³ã‚·ã‚’è¦‹ã¾ã—ã‚‡ã†",
+               "int4 ‚Ì‰ÁZƒŒƒCƒeƒ“ƒV‚ğŒ©‚Ü‚µ‚å‚¤",
                "clk",
                int4_add_latency_run,
                valid,
@@ -371,7 +381,7 @@ clinst_bench_init(void)
     INIT_BENCH(BENCH_GMEM_LOAD_LATENCY,
                RESULT_TYPE_FLOAT,
                "gmem load latency",
-               "gmem ã®ãƒ­ãƒ¼ãƒ‰ä¸€å€‹ã«ã‹ã‹ã‚‹æ™‚é–“",
+               "gmem ‚Ìƒ[ƒhˆêŒÂ‚É‚©‚©‚éŠÔ",
                "clk",
                gmem_load_latency_run,
                valid,
@@ -380,7 +390,7 @@ clinst_bench_init(void)
     INIT_BENCH(BENCH_GMEM_LOAD_LATENCY_LARGE,
                RESULT_TYPE_FLOAT,
                "gmem load latency uc",
-               "gmem ã®ãƒ­ãƒ¼ãƒ‰ä¸€å€‹ã«ã‹ã‹ã‚‹æ™‚é–“(ã‚­ãƒ£ãƒƒã‚·ãƒ¥ã«å…¥ã‚‰ãªã„)",
+               "gmem ‚Ìƒ[ƒhˆêŒÂ‚É‚©‚©‚éŠÔ(ƒLƒƒƒbƒVƒ…‚É“ü‚ç‚È‚¢)",
                "clk",
                gmem_load_latency_uc_run,
                valid,
@@ -389,7 +399,7 @@ clinst_bench_init(void)
     INIT_BENCH(BENCH_LMEM_LOAD_LATENCY,
                RESULT_TYPE_FLOAT,
                "lmem load latency",
-               "lmem ã®ãƒ­ãƒ¼ãƒ‰ä¸€å€‹ã«ã‹ã‹ã‚‹æ™‚é–“",
+               "lmem ‚Ìƒ[ƒhˆêŒÂ‚É‚©‚©‚éŠÔ",
                "clk",
                lmem_load_latency_run,
                valid,
@@ -399,7 +409,7 @@ clinst_bench_init(void)
     INIT_BENCH(BENCH_FMA1_THROUGHPUT,
                RESULT_TYPE_FLOAT,
                "fma1 throughput",
-               "ã‚³ãƒ³ãƒ”ãƒ¥ãƒ¼ã‚¿ã®æ€§èƒ½ã‚’è¨ˆæ¸¬ã—ã¾ã™",
+               "ƒRƒ“ƒsƒ…[ƒ^‚Ì«”\‚ğŒv‘ª‚µ‚Ü‚·",
                "GFLOPS",
                fma1_throughput_run,
                valid,
@@ -408,7 +418,7 @@ clinst_bench_init(void)
     INIT_BENCH(BENCH_FMA1DEP_THROUGHPUT,
                RESULT_TYPE_FLOAT,
                "fma1dep throughput",
-               "ã‚³ãƒ³ãƒ”ãƒ¥ãƒ¼ã‚¿ã®æ€§èƒ½ã‚’è¨ˆæ¸¬ã—ã¾ã™",
+               "ƒRƒ“ƒsƒ…[ƒ^‚Ì«”\‚ğŒv‘ª‚µ‚Ü‚·",
                "GFLOPS",
                fma1dep_throughput_run,
                valid,
@@ -417,7 +427,7 @@ clinst_bench_init(void)
     INIT_BENCH(BENCH_FMA4_THROUGHPUT,
                RESULT_TYPE_FLOAT,
                "fma4 throughput",
-               "ã‚³ãƒ³ãƒ”ãƒ¥ãƒ¼ã‚¿ã®æ€§èƒ½ã‚’è¨ˆæ¸¬ã—ã¾ã™",
+               "ƒRƒ“ƒsƒ…[ƒ^‚Ì«”\‚ğŒv‘ª‚µ‚Ü‚·",
                "GFLOPS",
                fma4_throughput_run,
                valid,
