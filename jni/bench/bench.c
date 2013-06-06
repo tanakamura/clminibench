@@ -98,6 +98,9 @@ set_pref_ndrange(cl_device_id dev,
     }
 
     clGetDeviceInfo(dev, CL_DEVICE_MAX_COMPUTE_UNITS, sizeof(val), &val, &sz);
+
+    val *= 32;
+
     gw[0] = lw[0] * val;
 }
 
