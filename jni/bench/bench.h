@@ -20,7 +20,7 @@ struct bench_result {
     int ival;
     char strval[4096];
     char score[4096];
-    char error_message[4096];
+    char error_message[8192];
 };
 
 struct clinst_bench_context {
@@ -58,6 +58,7 @@ struct clinst_bench {
 
 enum clinst_bench_code {
     BENCH_ENQUEUE_KERNEL_LATENCY,
+    BENCH_ENQUEUE16_KERNEL_LATENCY,
     BENCH_ENQUEUE_MEMREAD_LATENCY,
     BENCH_ENQUEUE_MEMWRITE_LATENCY,
     BENCH_ENQUEUE_MEMREAD_BANDWIDTH,
@@ -72,12 +73,13 @@ enum clinst_bench_code {
     BENCH_INT4_ADD_LATENCY,
 
     BENCH_GMEM_LOAD_LATENCY,
+    BENCH_CONSTANT_LOAD_LATENCY,
     BENCH_GMEM_LOAD_LATENCY_LARGE,
     BENCH_LMEM_LOAD_LATENCY,
 
-    BENCH_FMA1_THROUGHPUT,
-    BENCH_FMA1DEP_THROUGHPUT,
-    BENCH_FMA4_THROUGHPUT,
+    BENCH_MAD1_THROUGHPUT,
+    BENCH_MAD1DEP_THROUGHPUT,
+    BENCH_MAD4_THROUGHPUT,
 
 //    BENCH_INVALID_TEST,
 

@@ -19,16 +19,6 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/..)
 
 add_executable(clinstbench WIN32 w32-app.cpp resource.rc ../bench/bench.c ../port.c)
 
-set_property(TARGET clinstbench PROPERTY LINK_FLAGS "/MANIFEST:NO")
-
 target_link_libraries(clinstbench OpenCL.lib comctl32.lib)
 
-add_custom_command(
-        OUTPUT m
-        COMMAND mt -manifest app.manifest  -outputresource:clinstbench.exe
-        DEPENDS clinstbench
-)
-
 set(CMAKE_CXX_FLAGS_RELEASE "/MT /O2 /Ob2 /D NDEBUG")
-
-add_custom_target(mani ALL DEPENDS m)

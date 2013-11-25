@@ -8,6 +8,15 @@
 #include "resource.h"
 #include "w32-app.hpp"
 
+#pragma comment(linker, \
+    "\"/manifestdependency:type='Win32' "\
+    "name='Microsoft.Windows.Common-Controls' "\
+    "version='6.0.0.0' "\
+    "processorArchitecture='*' "\
+    "publicKeyToken='6595b64144ccf1df' "\
+    "language='*'\"")
+
+
 #ifndef CL_DEVICE_HALF_FP_CONFIG
 #define CL_DEVICE_HALF_FP_CONFIG                    0x1033
 #endif
