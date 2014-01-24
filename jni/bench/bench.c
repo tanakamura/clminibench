@@ -310,7 +310,7 @@ clinst_bench_init(void)
     INIT_BENCH(BENCH_ENQUEUE16_KERNEL_LATENCY,
                RESULT_TYPE_FLOAT,
                "enqueue kernel latency x16",
-               "ワークアイテム一個x16回起動する時間はかります。上のより短い場合はたくさんenqueuしましょう。",
+               "ワークアイテム一個x16回起動する時間(の平均)をはかります。上のより短い場合はたくさんenqueuしましょう。",
                "usec",
                kernel_latency_run16,
                valid,
