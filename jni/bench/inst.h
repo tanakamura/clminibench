@@ -18,6 +18,11 @@ inst_latency_run(struct bench_result *r,
 
     DECL_PARAM();
 
+
+    if (flags & CONSTANT_MEM) {
+        size = 32*1024;
+    }
+
     memset(host, 0, size);
     if (flags & INIT_INDEX) {
         int i;
@@ -45,6 +50,13 @@ inst_latency_run(struct bench_result *r,
 
     if (flags & HAS_LMEM) {
         KERNEL_ARG_LMEM(4, 4096);
+        if (flags & CONSTANT_MEM) {
+            KERNEL_ARG_GMEM(5, data);
+        }
+    } else {
+        if (flags & CONSTANT_MEM) {
+            KERNEL_ARG_GMEM(4, data);
+        }
     }
 
     RUN();
@@ -203,11 +215,30 @@ static const char gmem_load_latency_kernel[] =
             *gmem = off;
         });
 
+
+static const char constant_load_latency_kernel[] = 
+    K(void __kernel f(__global int *gmem,float v0_, float v1_, int nloop,  __constant int *cmem) {
+            int off = 0;
+
+            for (int i=0; i<nloop; i++) {
+                ITER64(off = cmem[off];)
+            }
+
+            *gmem = off;
+        });
+
 static void
 gmem_load_latency_run(struct bench_result *r,
                       struct clinst_bench_context *ctxt)
 {
     inst_latency_run(r,ctxt,gmem_load_latency_kernel,1, 0);
+}
+
+static void
+constant_load_latency_run(struct bench_result *r,
+                          struct clinst_bench_context *ctxt)
+{
+    inst_latency_run(r,ctxt,constant_load_latency_kernel,1, CONSTANT_MEM);
 }
 
 static void
@@ -238,7 +269,7 @@ lmem_load_latency_run(struct bench_result *r,
 }
 
 
-static const char fma1_throughput_kernel[] = 
+static const char mad1_throughput_kernel[] = 
     K(void __kernel f(__global float *gmem, float v0_, float v1_, int nloop) {
             float v00 = gmem[0];
             float v01 = gmem[1];
@@ -267,13 +298,13 @@ static const char fma1_throughput_kernel[] =
         });
 
 static void
-fma1_throughput_run(struct bench_result *r,
+mad1_throughput_run(struct bench_result *r,
                     struct clinst_bench_context *ctxt)
 {
-    inst_latency_run(r,ctxt,fma1_throughput_kernel, 2, THROUGHPUT);
+    inst_latency_run(r,ctxt,mad1_throughput_kernel, 2, THROUGHPUT);
 }
 
-static const char fma1dep_throughput_kernel[] = 
+static const char mad1dep_throughput_kernel[] = 
     K(void __kernel f(__global float *gmem, float v0_, float v1_, int nloop) {
             float v00 = gmem[0];
             float v01 = gmem[1];
@@ -287,15 +318,15 @@ static const char fma1dep_throughput_kernel[] =
         });
 
 static void
-fma1dep_throughput_run(struct bench_result *r,
+mad1dep_throughput_run(struct bench_result *r,
                        struct clinst_bench_context *ctxt)
 {
-    inst_latency_run(r,ctxt,fma1dep_throughput_kernel, 2, THROUGHPUT);
+    inst_latency_run(r,ctxt,mad1dep_throughput_kernel, 2, THROUGHPUT);
 }
 
 
 
-static const char fma4_throughput_kernel[] = 
+static const char mad4_throughput_kernel[] = 
     K(void __kernel f(__global float4 *gmem, float v0_, float v1_, int nloop) {
             float4 v00 = gmem[0];
             float4 v01 = gmem[1];
@@ -324,8 +355,8 @@ static const char fma4_throughput_kernel[] =
         });
 
 static void
-fma4_throughput_run(struct bench_result *r,
+mad4_throughput_run(struct bench_result *r,
                     struct clinst_bench_context *ctxt)
 {
-    inst_latency_run(r,ctxt,fma4_throughput_kernel, 8, THROUGHPUT);
+    inst_latency_run(r,ctxt,mad4_throughput_kernel, 8, THROUGHPUT);
 }

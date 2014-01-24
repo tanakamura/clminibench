@@ -18,6 +18,7 @@
 #define HAS_LMEM (1<<0)
 #define INIT_INDEX (1<<1)
 #define THROUGHPUT (1<<2)
+#define CONSTANT_MEM (1<<3)
 
 #define  LOG_TAG    "libclminibench"
 #define  LOGI(...)  __android_log_print(ANDROID_LOG_INFO,LOG_TAG,__VA_ARGS__)
@@ -167,7 +168,8 @@ build_kernel(struct bench_result *r,
 
 #define WORK_DIM_PREF() dim=1; set_pref_ndrange(ctxt->dev, ker, gw, lw);
 
-#define RUN() if (run(r, ctxt, ker, dim, gw, lw) < 0) { return; }
+#define RUN() if (run(r, ctxt, ker, dim, gw, lw, 1) < 0) { return; }
+#define RUN_N(N) if (run(r, ctxt, ker, dim, gw, lw, N) < 0) { return; }
 
 static int
 run(struct bench_result *r,
@@ -175,14 +177,18 @@ run(struct bench_result *r,
     cl_kernel ker,
     int dim,
     size_t *gw,
-    size_t *lw)
+    size_t *lw,
+    int num_enq)
 {
-    cl_int st = clEnqueueNDRangeKernel(ctxt->queue, ker, dim, NULL, gw, lw, 0, NULL, NULL);
-    if (st != CL_SUCCESS) {
-        r->code = BENCH_ENQUEUE_KERNEL_ERROR;
-        sprintf(r->error_message, "ndrange error : %d\n", (int)st);
-        puts(r->error_message);
-        return -1;
+    int qi;
+    for (qi=0; qi<num_enq; qi++) {
+        cl_int st = clEnqueueNDRangeKernel(ctxt->queue, ker, dim, NULL, gw, lw, 0, NULL, NULL);
+        if (st != CL_SUCCESS) {
+            r->code = BENCH_ENQUEUE_KERNEL_ERROR;
+            sprintf(r->error_message, "ndrange error : %d\n", (int)st);
+            puts(r->error_message);
+            return -1;
+        }
     }
     clFinish(ctxt->queue);
 
@@ -229,6 +235,41 @@ kernel_latency_run(struct bench_result *r,
     get_score(r->score);
 }
 
+static void
+kernel_latency_run16(struct bench_result *r,
+                     struct clinst_bench_context *ctxt)
+{
+    int i;
+    timeval_t t0, t1;
+    double usec;
+    int nloop = 100;
+
+    DECL_PARAM();
+    KERNEL(kernel_latency_kernel);
+
+    WORK_DIM1(1,1);
+
+    RUN_N(16);
+
+    timeval_get(&t0);
+
+    for (i=0; i<nloop; i++) {
+        RUN_N(16);
+    }
+
+    timeval_get(&t1);
+
+    RELEASE_ALL();
+
+    usec = timeval_diff_usec(&t0, &t1);
+    usec /= (nloop*16);
+
+    r->code = BENCH_OK;
+    r->fval = usec;
+    get_score(r->score);
+}
+
+
 #include "mem.h"
 #include "inst.h"
 
@@ -263,6 +304,15 @@ clinst_bench_init(void)
                "ワークアイテム一個起動する時間はかります。みじかいほどよいです",
                "usec",
                kernel_latency_run,
+               valid,
+               kernel_latency_kernel);
+
+    INIT_BENCH(BENCH_ENQUEUE16_KERNEL_LATENCY,
+               RESULT_TYPE_FLOAT,
+               "enqueue kernel latency x16",
+               "ワークアイテム一個x16回起動する時間はかります。上のより短い場合はたくさんenqueuしましょう。",
+               "usec",
+               kernel_latency_run16,
                valid,
                kernel_latency_kernel);
 
@@ -389,6 +439,15 @@ clinst_bench_init(void)
                valid,
                gmem_load_latency_kernel);
 
+    INIT_BENCH(BENCH_CONSTANT_LOAD_LATENCY,
+               RESULT_TYPE_FLOAT,
+               "constant load latency",
+               "constant のロード一個にかかる時間",
+               "clk",
+               constant_load_latency_run,
+               valid,
+               constant_load_latency_kernel);
+
     INIT_BENCH(BENCH_GMEM_LOAD_LATENCY_LARGE,
                RESULT_TYPE_FLOAT,
                "gmem load latency uc",
@@ -408,32 +467,32 @@ clinst_bench_init(void)
                lmem_load_latency_kernel);
 
 
-    INIT_BENCH(BENCH_FMA1_THROUGHPUT,
+    INIT_BENCH(BENCH_MAD1_THROUGHPUT,
                RESULT_TYPE_FLOAT,
-               "fma1 throughput",
-               "コンピュータの性能を計測します",
+               "mad1 throughput",
+               "コンピュータの性能を計測します。はやいほどはやいです。",
                "GFLOPS",
-               fma1_throughput_run,
+               mad1_throughput_run,
                valid,
-               fma1_throughput_kernel);
+               mad1_throughput_kernel);
 
-    INIT_BENCH(BENCH_FMA1DEP_THROUGHPUT,
+    INIT_BENCH(BENCH_MAD1DEP_THROUGHPUT,
                RESULT_TYPE_FLOAT,
-               "fma1dep throughput",
-               "コンピュータの性能を計測します",
+               "mad1dep throughput",
+               "コンピュータの性能を計測します。はやいほどはやいです。",
                "GFLOPS",
-               fma1dep_throughput_run,
+               mad1dep_throughput_run,
                valid,
-               fma1dep_throughput_kernel);
+               mad1dep_throughput_kernel);
 
-    INIT_BENCH(BENCH_FMA4_THROUGHPUT,
+    INIT_BENCH(BENCH_MAD4_THROUGHPUT,
                RESULT_TYPE_FLOAT,
-               "fma4 throughput",
-               "コンピュータの性能を計測します",
+               "mad4 throughput",
+               "コンピュータの性能を計測します。はやいほどはやいです。",
                "GFLOPS",
-               fma4_throughput_run,
+               mad4_throughput_run,
                valid,
-               fma4_throughput_kernel);
+               mad4_throughput_kernel);
 
 
     return benches;
