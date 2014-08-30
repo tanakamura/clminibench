@@ -304,6 +304,44 @@ mad1_throughput_run(struct bench_result *r,
     inst_latency_run(r,ctxt,mad1_throughput_kernel, 2, THROUGHPUT);
 }
 
+static const char double_mad1_throughput_kernel[] =
+    "#pragma OPENCL EXTENSION cl_khr_fp64 : enable\n\n"
+
+    K(void __kernel f(__global float *gmem, float v0_, float v1_, int nloop) {
+            double v00 = gmem[0];
+            double v01 = gmem[1];
+            double v02 = gmem[2];
+
+            double v10 = gmem[3];
+            double v11 = gmem[4];
+            double v12 = gmem[5];
+
+            double v20 = gmem[6];
+            double v21 = gmem[7];
+            double v22 = gmem[8];
+
+            double v30 = gmem[9];
+            double v31 = gmem[10];
+            double v32 = gmem[11];
+
+            for (int i=0; i<nloop; i++) {
+                ITER16(v00 = v00 * v01 + v02;);
+                ITER16(v10 = v10 * v11 + v12;);
+                ITER16(v20 = v20 * v21 + v22;);
+                ITER16(v30 = v30 * v31 + v32;);
+            }
+
+            *gmem = v00 + v10 + v20 + v30;
+        });
+
+static void
+double_mad1_throughput_run(struct bench_result *r,
+                           struct clinst_bench_context *ctxt)
+{
+    inst_latency_run(r,ctxt,double_mad1_throughput_kernel, 2, THROUGHPUT);
+}
+
+
 static const char mad1dep_throughput_kernel[] = 
     K(void __kernel f(__global float *gmem, float v0_, float v1_, int nloop) {
             float v00 = gmem[0];

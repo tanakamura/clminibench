@@ -16,38 +16,6 @@
     "publicKeyToken='6595b64144ccf1df' "\
     "language='*'\"")
 
-#ifndef CL_DEVICE_HALF_FP_CONFIG
-#define CL_DEVICE_HALF_FP_CONFIG                    0x1033
-#endif
-#ifndef CL_DEVICE_SIMD_WIDTH_AMD
-#define CL_DEVICE_SIMD_WIDTH_AMD                    0x4041
-#endif
-#ifndef CL_DEVICE_SIMD_INSTRUCTION_WIDTH_AMD
-#define CL_DEVICE_SIMD_INSTRUCTION_WIDTH_AMD        0x4042
-#endif
-#ifndef CL_DEVICE_WAVEFRONT_WIDTH_AMD
-#define CL_DEVICE_WAVEFRONT_WIDTH_AMD               0x4043
-#endif
-#ifndef CL_DEVICE_SIMD_PER_COMPUTE_UNIT_AMD
-#define CL_DEVICE_SIMD_PER_COMPUTE_UNIT_AMD         0x4040
-#endif
-
-#ifndef CL_DEVICE_WARP_SIZE_NV
-#define CL_DEVICE_WARP_SIZE_NV                      0x4003
-#endif
-
-#ifndef CL_DEVICE_REGISTERS_PER_BLOCK_NV
-#define CL_DEVICE_REGISTERS_PER_BLOCK_NV            0x4002
-#endif
-
-#ifndef CL_DEVICE_COMPUTE_CAPABILITY_MAJOR_NV
-#define CL_DEVICE_COMPUTE_CAPABILITY_MAJOR_NV       0x4000
-#endif
-
-#ifndef CL_DEVICE_COMPUTE_CAPABILITY_MINOR_NV
-#define CL_DEVICE_COMPUTE_CAPABILITY_MINOR_NV       0x4001
-#endif
-
 
 
 #define CLASS_NAME TEXT("clibench")

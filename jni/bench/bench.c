@@ -57,6 +57,18 @@ clinst_bench_init_context(struct clinst_bench_context *ctxt,
     ctxt->dev = dev;
     ctxt->ctxt = clCreateContext(cps, 1, &dev, NULL, NULL, NULL);
     ctxt->queue = clCreateCommandQueue(ctxt->ctxt, dev, 0, NULL);
+    ctxt->hint = 0;
+
+    {
+        cl_int simd_width;
+        size_t sz;
+        int r = clGetDeviceInfo(dev, CL_DEVICE_SIMD_INSTRUCTION_WIDTH_AMD, sizeof(simd_width), &simd_width, &sz);
+
+        if (r == CL_SUCCESS && simd_width == 16) {
+            /* おそらく AMD GPU */
+            ctxt->hint = HINT_AMD_GPU;
+        }
+    }
 
     return 0;
 }
@@ -72,7 +84,8 @@ static void
 set_pref_ndrange(cl_device_id dev,
                  cl_kernel ker,
                  size_t *gw,
-                 size_t *lw)
+                 size_t *lw,
+                 enum clinst_bench_hint hint)
 {
     cl_int val;
     size_t sz;
@@ -99,7 +112,11 @@ set_pref_ndrange(cl_device_id dev,
 
     clGetDeviceInfo(dev, CL_DEVICE_MAX_COMPUTE_UNITS, sizeof(val), &val, &sz);
 
-    val *= 32;
+    if (hint == HINT_AMD_GPU) {     /* GCNは多めに入れないと性能出ない */
+        val *= 16;
+    } else {
+        val *= 2;
+    }
 
     gw[0] = lw[0] * val;
 }
@@ -119,6 +136,7 @@ build_kernel(struct bench_result *r,
 {
     size_t sz[1];
     cl_int st;
+
     sz[0] = strlen(code);
     *prog = clCreateProgramWithSource(ctxt->ctxt, 1, &code, sz, NULL);
     if (*prog == NULL) {
@@ -131,7 +149,18 @@ build_kernel(struct bench_result *r,
     if (st != CL_SUCCESS) {
         size_t s;
         r->code = BENCH_BUILD_ERROR;
-        clGetProgramBuildInfo(*prog, ctxt->dev, CL_PROGRAM_BUILD_LOG, sizeof(r->error_message), r->error_message, &s);
+
+        clGetProgramBuildInfo(*prog, ctxt->dev, CL_PROGRAM_BUILD_LOG, 0, NULL, &s);
+        char *ptr = malloc(s);
+        clGetProgramBuildInfo(*prog, ctxt->dev, CL_PROGRAM_BUILD_LOG, s, ptr, &s);
+        if (s > sizeof(r->error_message)) {
+            memcpy(r->error_message, ptr, sizeof(r->error_message)-1);
+            r->error_message[sizeof(r->error_message)-1] = '\0';
+        } else {
+            strcpy(r->error_message, ptr, s);
+        }
+
+        free(ptr);
         clReleaseProgram(*prog);
         return -1;
     }
@@ -166,7 +195,7 @@ build_kernel(struct bench_result *r,
 
 #define WORK_DIM1(g,l) dim=1; gw[0]=g; lw[0]=l;
 
-#define WORK_DIM_PREF() dim=1; set_pref_ndrange(ctxt->dev, ker, gw, lw);
+#define WORK_DIM_PREF() dim=1; set_pref_ndrange(ctxt->dev, ker, gw, lw, ctxt->hint);
 
 #define RUN() if (run(r, ctxt, ker, dim, gw, lw, 1) < 0) { return; }
 #define RUN_N(N) if (run(r, ctxt, ker, dim, gw, lw, N) < 0) { return; }
@@ -286,6 +315,28 @@ static int
 valid(cl_device_id dev, const char **reason)
 {
     return 1;
+}
+
+static int
+check_double(cl_device_id dev, const char **reason)
+{
+    char *exts;
+    size_t str_len;
+    int supported;
+
+    clGetDeviceInfo(dev, CL_DEVICE_EXTENSIONS, 0, NULL, &str_len);
+    exts = malloc(str_len);
+    clGetDeviceInfo(dev, CL_DEVICE_EXTENSIONS, str_len, exts, &str_len);
+
+    supported = (strstr(exts, "cl_khr_fp64") != NULL);
+
+    free(exts);
+
+    if (!supported) {
+        *reason = "cl_khr_fp64 必要";
+    }
+
+    return supported;
 }
 
 static int
@@ -493,6 +544,15 @@ clinst_bench_init(void)
                mad4_throughput_run,
                valid,
                mad4_throughput_kernel);
+
+    INIT_BENCH(BENCH_DOUBLE_MAD1_THROUGHPUT,
+               RESULT_TYPE_FLOAT,
+               "mad1 throughput(double)",
+               "コンピュータの性能を計測します。はやいほどはやいです。",
+               "GFLOPS",
+               double_mad1_throughput_run,
+               check_double,
+               double_mad1_throughput_kernel);
 
 
     return benches;

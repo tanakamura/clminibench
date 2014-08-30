@@ -3,6 +3,40 @@
 
 #include <CL/cl.h>
 
+#ifndef CL_DEVICE_HALF_FP_CONFIG
+#define CL_DEVICE_HALF_FP_CONFIG                    0x1033
+#endif
+#ifndef CL_DEVICE_SIMD_WIDTH_AMD
+#define CL_DEVICE_SIMD_WIDTH_AMD                    0x4041
+#endif
+#ifndef CL_DEVICE_SIMD_INSTRUCTION_WIDTH_AMD
+#define CL_DEVICE_SIMD_INSTRUCTION_WIDTH_AMD        0x4042
+#endif
+#ifndef CL_DEVICE_WAVEFRONT_WIDTH_AMD
+#define CL_DEVICE_WAVEFRONT_WIDTH_AMD               0x4043
+#endif
+#ifndef CL_DEVICE_SIMD_PER_COMPUTE_UNIT_AMD
+#define CL_DEVICE_SIMD_PER_COMPUTE_UNIT_AMD         0x4040
+#endif
+
+#ifndef CL_DEVICE_WARP_SIZE_NV
+#define CL_DEVICE_WARP_SIZE_NV                      0x4003
+#endif
+
+#ifndef CL_DEVICE_REGISTERS_PER_BLOCK_NV
+#define CL_DEVICE_REGISTERS_PER_BLOCK_NV            0x4002
+#endif
+
+#ifndef CL_DEVICE_COMPUTE_CAPABILITY_MAJOR_NV
+#define CL_DEVICE_COMPUTE_CAPABILITY_MAJOR_NV       0x4000
+#endif
+
+#ifndef CL_DEVICE_COMPUTE_CAPABILITY_MINOR_NV
+#define CL_DEVICE_COMPUTE_CAPABILITY_MINOR_NV       0x4001
+#endif
+
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -23,7 +57,13 @@ struct bench_result {
     char error_message[8192];
 };
 
+enum clinst_bench_hint {
+    HINT_AMD_GPU,
+};
+
 struct clinst_bench_context {
+    enum clinst_bench_hint hint;
+
     cl_context ctxt;
     cl_device_id dev;
     cl_command_queue queue;
@@ -80,6 +120,8 @@ enum clinst_bench_code {
     BENCH_MAD1_THROUGHPUT,
     BENCH_MAD1DEP_THROUGHPUT,
     BENCH_MAD4_THROUGHPUT,
+
+    BENCH_DOUBLE_MAD1_THROUGHPUT,
 
 //    BENCH_INVALID_TEST,
 
