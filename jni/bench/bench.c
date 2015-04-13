@@ -145,7 +145,7 @@ build_kernel(struct bench_result *r,
         return -1;
     }
 
-    st = clBuildProgram(*prog, 1, &ctxt->dev, "-cl-fast-relaxed-math", NULL, NULL);
+    st = clBuildProgram(*prog, 1, &ctxt->dev, " ", NULL, NULL);
     if (st != CL_SUCCESS) {
         size_t s;
         r->code = BENCH_BUILD_ERROR;
@@ -157,7 +157,7 @@ build_kernel(struct bench_result *r,
             memcpy(r->error_message, ptr, sizeof(r->error_message)-1);
             r->error_message[sizeof(r->error_message)-1] = '\0';
         } else {
-            strcpy(r->error_message, ptr, s);
+            strcpy(r->error_message, ptr);
         }
 
         free(ptr);
