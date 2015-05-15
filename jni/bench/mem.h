@@ -188,8 +188,17 @@ global_read_run(struct bench_result *r,
     timeval_get(&t0);
 
     for (i=0; i<nloop; i++) {
+        timeval_get(&t1);
+        double msec = timeval_diff_msec(&t0, &t1);
+        if (msec >= TIMEOUT) {
+            /* timeout */
+            break;
+        }
+
         RUN();
     }
+
+    nloop = i;
 
     timeval_get(&t1);
 

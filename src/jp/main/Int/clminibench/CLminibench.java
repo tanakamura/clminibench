@@ -5,7 +5,8 @@ public class CLminibench {
     static final int RESULT_TYPE_INT = 1;
 
     static {
-	System.load("/system/vendor/lib/egl/libGLES_mali.so");
+	//System.load("/system/vendor/lib/egl/libGLES_mali.so");
+        System.load("/system/vendor/lib/libOpenCL.so");
 	System.loadLibrary("clminibench");
     }
 
