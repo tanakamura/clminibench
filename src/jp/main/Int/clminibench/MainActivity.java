@@ -129,4 +129,16 @@ public class MainActivity extends Activity {
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+        case R.id.action_settings:
+            newGame();
+            return true;
+        default:
+            return super.onOptionsItemSelected(item);
+        }
+    }
+
 }
