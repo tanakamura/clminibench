@@ -3,7 +3,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <android/log.h>
 
 #define TIMEOUT 2000
 
@@ -23,9 +22,15 @@
 #define THROUGHPUT (1<<2)
 #define CONSTANT_MEM (1<<3)
 
+#ifdef __ANDROID__
+#include <android/log.h>
+
 #define  LOG_TAG    "libclminibench"
 #define  LOGI(...)  __android_log_print(ANDROID_LOG_INFO,LOG_TAG,__VA_ARGS__)
 #define  LOGE(...)  __android_log_print(ANDROID_LOG_ERROR,LOG_TAG,__VA_ARGS__)
+#endif
+
+
 static struct clinst_bench benches[BENCH_NUM];
 
 static const char * const eval_message[] = {

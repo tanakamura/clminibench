@@ -1,6 +1,10 @@
 #ifndef BENCH_H
 #define BENCH_H
 
+#ifdef __ANDROID__
+#include "../CLlib.h"
+#endif
+
 #include <CL/cl.h>
 
 #ifndef CL_DEVICE_HALF_FP_CONFIG

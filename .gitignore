@@ -10,3 +10,9 @@ CMakeFiles
 obj
 libs
 bin
+*~
+build.xml
+gen
+*.so
+*.properties
+res/drawable-ldpi

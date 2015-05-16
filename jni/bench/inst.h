@@ -88,7 +88,7 @@ inst_latency_run(struct bench_result *r,
 
         r->fval = total_op / (usec*1000.0);
 
-        LOGI("fval1 = %f, %f, %f\n", r->fval, total_op, usec);
+        //LOGI("fval1 = %f, %f, %f\n", r->fval, total_op, usec);
     } else {
         cl_int freq;
         size_t sz;

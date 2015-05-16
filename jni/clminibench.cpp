@@ -2,6 +2,8 @@
 #include <OpenCL.h>
 #include <android/log.h>
 #include <stdint.h>
+#include <stdlib.h>
+#include "CLlib.h"
 #include "npr/strbuf.h"
 #include "bench/bench.h"
 
@@ -115,18 +117,26 @@ platform_select(JNIEnv *env, jobject obj, cl_minibench *b, int sel)
     jobjectArray dev_names = env->NewObjectArray(num, string_class, NULL);
 
     for (int i=0; i<num; i++) {
-        char buffer[1024];
+        char *buffer;
         size_t sz;
-        clGetDeviceInfo(devs[i], CL_DEVICE_NAME, 1024, buffer, &sz);
+        clGetDeviceInfo(devs[i], CL_DEVICE_NAME, 0, NULL, &sz);
+        buffer = (char*)malloc(sz+1);
+        clGetDeviceInfo(devs[i], CL_DEVICE_NAME, sz, buffer, &sz);
+        buffer[sz] = '\0';
         jstring name = env->NewStringUTF(buffer);
+        free(buffer);
         env->SetObjectArrayElement(dev_names, i, name);
     }
 
     {
-        char buffer[1024];
+        char *buffer;
         size_t len;
-        clGetPlatformInfo(p, CL_PLATFORM_NAME, 1024, buffer, &len);
+        clGetPlatformInfo(p, CL_PLATFORM_NAME, 0, NULL, &len);
+        buffer = (char*)malloc(len+1);
+        clGetPlatformInfo(p, CL_PLATFORM_NAME, len, buffer, &len);
+        buffer[len] = '\0';
         jstring platform_name = env->NewStringUTF(buffer);
+        free(buffer);
         env->SetObjectField(obj, cur_platform_name_id, platform_name);
     }
     env->SetObjectField(obj, dev_names_id, dev_names);
@@ -136,6 +146,11 @@ platform_select(JNIEnv *env, jobject obj, cl_minibench *b, int sel)
 JNIEXPORT void JNICALL
 Java_jp_main_Int_clminibench_CLminibench_init(JNIEnv *env, jobject obj)
 {
+    int r = cllib_init();
+    if (r < 0) {
+        return;
+    }
+
     jclass cls = env->GetObjectClass(obj);
 
     cl_int ret;
@@ -385,7 +400,7 @@ Java_jp_main_Int_clminibench_CLminibench_run(JNIEnv *env, jobject obj, jint id)
 
     r.fval = 0;
 
-    LOGI("run %d\n", id);
+    //LOGI("run %d\n", id);
 
     b[id].run(&r, &app->bench_ctxt);
 
@@ -395,7 +410,7 @@ Java_jp_main_Int_clminibench_CLminibench_run(JNIEnv *env, jobject obj, jint id)
         jstring error_message = env->NewStringUTF(r.error_message);
         env->SetObjectField(robj, result_error_message_id, error_message);
 
-        LOGI("run %d: code=%d, error=%s, ker=%s\n", id, r.code, r.error_message, b[id].cl_code);
+        //LOGI("run %d: code=%d, error=%s, ker=%s\n", id, r.code, r.error_message, b[id].cl_code);
     } else {
         env->SetIntField(robj, result_ival_id, r.ival);
         env->SetDoubleField(robj, result_fval_id, r.fval);
@@ -403,7 +418,7 @@ Java_jp_main_Int_clminibench_CLminibench_run(JNIEnv *env, jobject obj, jint id)
         jstring score_message = env->NewStringUTF(r.score);
         env->SetObjectField(robj, result_score_id, score_message);
 
-        LOGI("run %d: code=%d, ival=%d, fval=%f\n", id, r.code, r.ival, r.fval);
+        //LOGI("run %d: code=%d, ival=%d, fval=%f\n", id, r.code, r.ival, r.fval);
     }
 
     return robj;

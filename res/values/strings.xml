@@ -4,5 +4,6 @@
     <string name="app_name">clminibench</string>
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
+    <string name="seldevice_title">Select Device</string>
 
 </resources>
