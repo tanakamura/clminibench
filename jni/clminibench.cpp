@@ -59,17 +59,22 @@ struct cl_minibench {
 extern "C" {
 
 JNIEXPORT void JNICALL Java_jp_main_Int_clminibench_CLminibench_seldev(JNIEnv *env, jobject obj, int dev);
-JNIEXPORT void JNICALL Java_jp_main_Int_clminibench_CLminibench_init0(JNIEnv *env, jclass obj);
+JNIEXPORT jint JNICALL Java_jp_main_Int_clminibench_CLminibench_init0(JNIEnv *env, jclass obj);
 JNIEXPORT void JNICALL Java_jp_main_Int_clminibench_CLminibench_init(JNIEnv *env, jobject obj);
 JNIEXPORT jobject JNICALL Java_jp_main_Int_clminibench_CLminibench_run(JNIEnv *env, jobject obj, jint id);
 
 }
 
 
-JNIEXPORT void JNICALL
+JNIEXPORT jint JNICALL
 Java_jp_main_Int_clminibench_CLminibench_init0(JNIEnv *env, jclass cls)
 {
     if (ptr_id == 0) {
+        int r = cllib_init();
+        if (r < 0) {
+            return -1;
+        }
+
         ptr_id = env->GetFieldID(cls, "ptr_value", "J");
         cur_dev_config_id = env->GetFieldID(cls, "cur_dev_config", "Ljava/lang/String;");
         cur_dev_name_id = env->GetFieldID(cls, "cur_dev_name", "Ljava/lang/String;");
@@ -95,6 +100,8 @@ Java_jp_main_Int_clminibench_CLminibench_init0(JNIEnv *env, jclass cls)
             result_error_message_id = env->GetFieldID(result_cls, "error_message", "Ljava/lang/String;");
         }
     }
+
+    return 0;
 }
 
 static void
@@ -146,11 +153,6 @@ platform_select(JNIEnv *env, jobject obj, cl_minibench *b, int sel)
 JNIEXPORT void JNICALL
 Java_jp_main_Int_clminibench_CLminibench_init(JNIEnv *env, jobject obj)
 {
-    int r = cllib_init();
-    if (r < 0) {
-        return;
-    }
-
     jclass cls = env->GetObjectClass(obj);
 
     cl_int ret;

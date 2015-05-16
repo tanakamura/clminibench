@@ -52,20 +52,24 @@ public class MainActivity extends FragmentActivity {
 	//this.left.setOrientation(LinearLayout.VERTICAL);
 	this.right.setOrientation(LinearLayout.VERTICAL);
 
-        CLminibench.init0();
-        CLminibench cl = new CLminibench();
-	cl.init();
-        this.cl = cl;
+        int have = CLminibench.init0();
+        if (have) {
+            CLminibench cl = new CLminibench();
+            cl.init();
+            this.cl = cl;
 
-        this.rights = new ScrollView(this);
-        this.rights.addView(right);
+            this.rights = new ScrollView(this);
+            this.rights.addView(right);
 
-	this.right_text = new TextView(this);
-	this.right_text.setText("right");
-	right.addView(this.right_text);
-	this.right_text.setTextSize(20);
+            this.right_text = new TextView(this);
+            this.right_text.setText("right");
+            right.addView(this.right_text);
+            this.right_text.setTextSize(20);
 
-        this.setDevice(0);
+            this.setDevice(0);
+        } else {
+            
+        }
     }
 
     public void setDevice(int dev) {

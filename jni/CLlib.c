@@ -30,5 +30,5 @@ cllib_init(void)
     LOGI("%p %p\n",
          p_clGetPlatformIDs, p_clGetPlatformIDs);
 
-    return 0;
+    return -1;
 }

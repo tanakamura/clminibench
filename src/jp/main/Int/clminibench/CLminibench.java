@@ -26,7 +26,7 @@ public class CLminibench {
     boolean bench_valid_list[];
     int result_type_list[];
 
-    public static native void init0();
+    public static native int init0();
 
     public native void init();
 
