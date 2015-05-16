@@ -179,7 +179,6 @@ Java_jp_main_Int_clminibench_CLminibench_init(JNIEnv *env, jobject obj)
     jobjectArray bench_desc_list = env->NewObjectArray(BENCH_NUM, string_class, NULL);
     jobjectArray bench_unit_list = env->NewObjectArray(BENCH_NUM, string_class, NULL);
     jobjectArray bench_cl_code_list = env->NewObjectArray(BENCH_NUM, string_class, NULL);
-    jbooleanArray bench_valid_list = env->NewBooleanArray(BENCH_NUM);
     jintArray bench_result_type_list = env->NewIntArray(BENCH_NUM);
 
 
@@ -380,14 +379,22 @@ Java_jp_main_Int_clminibench_CLminibench_seldev(JNIEnv *env, jobject obj, int de
         env->SetObjectField(obj, cur_dev_name_id, name);
     }
 
-    /*
+    jbooleanArray valid_list = env->NewBooleanArray(BENCH_NUM);
     for (int i=0; i<BENCH_NUM; i++) {
-        int valid = app->bench[i].is_valid(devs[dev], &app->invalid_reason[i]);
-        app->valid[i] = valid;
-        EnableWindow(app->bench_run_button[i], valid);
-        Edit_SetText(app->bench_label[i], app->bench[i].name);
+        const char *reason;
+        int valid = app->bench[i].is_valid(devs[dev], &reason);
+        jboolean jvalid;
+
+        if (valid) {
+            jvalid = JNI_TRUE;
+        } else {
+            jvalid = JNI_FALSE;
+        }
+
+        env->SetBooleanArrayRegion(valid_list, i, 1, &jvalid);
     }
-    */
+
+    env->SetObjectField(obj, bench_valid_list_id, valid_list);
 }
 
 

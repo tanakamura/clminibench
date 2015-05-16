@@ -24,8 +24,34 @@ cllib_init(void)
         return -1;
     }
 
-    p_clGetDeviceInfo = dlsym(handle, "clGetDeviceInfo");
-    p_clGetPlatformIDs = dlsym(handle, "clGetPlatformIDs");
+#define LOAD(name)                              \
+    p_##name = dlsym(handle, #name);            \
+        if (p_##name == NULL) {                 \
+            return -1;                          \
+        }
+
+    LOAD(clGetDeviceInfo);
+    LOAD(clGetPlatformIDs);
+    LOAD(clGetDeviceIDs);
+    LOAD(clGetPlatformInfo);
+    LOAD(clCreateProgramWithSource);
+    LOAD(clBuildProgram);
+    LOAD(clGetProgramBuildInfo);
+    LOAD(clReleaseProgram);
+    LOAD(clCreateKernel);
+    LOAD(clCreateBuffer);
+    LOAD(clEnqueueWriteBuffer);
+    LOAD(clFlush);
+    LOAD(clReleaseMemObject);
+    LOAD(clEnqueueReadBuffer);
+    LOAD(clFinish);
+    LOAD(clEnqueueNDRangeKernel);
+    LOAD(clReleaseKernel);
+    LOAD(clSetKernelArg);
+    LOAD(clCreateCommandQueue);
+    LOAD(clCreateContext);
+    LOAD(clReleaseCommandQueue);
+    LOAD(clReleaseContext);
 
     return 0;
 }

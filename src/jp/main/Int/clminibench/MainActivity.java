@@ -30,6 +30,7 @@ public class MainActivity extends FragmentActivity {
 
     CLminibench cl;
     LayoutParams lp;
+    boolean valid;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +70,8 @@ public class MainActivity extends FragmentActivity {
             this.right_text.setTextSize(20);
 
             this.setDevice(0);
+
+            valid = true;
         } else {
             //final MainActivity a = this;
             new AlertDialog.Builder(this)
@@ -81,6 +84,8 @@ public class MainActivity extends FragmentActivity {
                         }
                     })
                 .show();
+
+            valid = false;
         }
     }
 
@@ -123,21 +128,26 @@ public class MainActivity extends FragmentActivity {
                         break;
                     default: {
                         int bench_id = pos - 2;
-                        BenchResult r = cl.run(bench_id);
 
-                        if (r.code == BenchResult.BENCH_OK) {
-                            String rs;
-                            if (cl.result_type_list[bench_id] == CLminibench.RESULT_TYPE_INT) {
-                                rs = cl.bench_desc_list[bench_id] + "\n" +
-                                    r.ival + cl.bench_unit_list[bench_id] + "\n\n" +
-                                    cl.bench_cl_code_list[bench_id];
-                            } else {
-                                rs = cl.bench_desc_list[bench_id] + "\n" +
-                                    r.fval + cl.bench_unit_list[bench_id] + "\n\n" +
-                                    cl.bench_cl_code_list[bench_id];
+                        if (cl.bench_valid_list[bench_id]) {
+                            BenchResult r = cl.run(bench_id);
+
+                            if (r.code == BenchResult.BENCH_OK) {
+                                String rs;
+                                if (cl.result_type_list[bench_id] == CLminibench.RESULT_TYPE_INT) {
+                                    rs = cl.bench_desc_list[bench_id] + "\n" +
+                                        r.ival + cl.bench_unit_list[bench_id] + "\n\n" +
+                                        cl.bench_cl_code_list[bench_id];
+                                } else {
+                                    rs = cl.bench_desc_list[bench_id] + "\n" +
+                                        r.fval + cl.bench_unit_list[bench_id] + "\n\n" +
+                                        cl.bench_cl_code_list[bench_id];
+                                }
+                                //Log.d("cl", rs);
+                                right_text.setText(rs);
                             }
-                            //Log.d("cl", rs);
-                            right_text.setText(rs);
+                        } else {
+                            right_text.setText("This test is not supported on this device.");
                         }
                     }
                         break;
@@ -160,8 +170,10 @@ public class MainActivity extends FragmentActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
         case R.id.action_settings: {
-            SelectDeviceDialogFragment newFragment = new SelectDeviceDialogFragment(this,cl.dev_names);
-            ((DialogFragment)newFragment).show(getSupportFragmentManager(), "seldev");
+            if (valid) {
+                SelectDeviceDialogFragment newFragment = new SelectDeviceDialogFragment(this,cl.dev_names);
+                ((DialogFragment)newFragment).show(getSupportFragmentManager(), "seldev");
+            }
         }
             return true;
         default:
