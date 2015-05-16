@@ -365,6 +365,7 @@ Java_jp_main_Int_clminibench_CLminibench_seldev(JNIEnv *env, jobject obj, int de
     clinst_bench_init_context(&app->bench_ctxt, devs[dev]);
 
     npr_strbuf_putc(&sb, '\n');
+    npr_strbuf_putc(&sb, '\0');
 
     jstring config = env->NewStringUTF(sb.buf);
     npr_strbuf_fini(&sb);

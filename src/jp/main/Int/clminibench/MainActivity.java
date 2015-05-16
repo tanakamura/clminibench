@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import android.support.v4.app.DialogFragment;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -52,8 +54,8 @@ public class MainActivity extends FragmentActivity {
 	//this.left.setOrientation(LinearLayout.VERTICAL);
 	this.right.setOrientation(LinearLayout.VERTICAL);
 
-        int have = CLminibench.init0();
-        if (have) {
+        int r = CLminibench.init0();
+        if (r == 0) {
             CLminibench cl = new CLminibench();
             cl.init();
             this.cl = cl;
@@ -68,7 +70,17 @@ public class MainActivity extends FragmentActivity {
 
             this.setDevice(0);
         } else {
-            
+            //final MainActivity a = this;
+            new AlertDialog.Builder(this)
+                .setTitle("error")
+                .setMessage("can't load libOpenCL.so.")
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            //a.finish();
+                        }
+                    })
+                .show();
         }
     }
 

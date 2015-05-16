@@ -27,8 +27,5 @@ cllib_init(void)
     p_clGetDeviceInfo = dlsym(handle, "clGetDeviceInfo");
     p_clGetPlatformIDs = dlsym(handle, "clGetPlatformIDs");
 
-    LOGI("%p %p\n",
-         p_clGetPlatformIDs, p_clGetPlatformIDs);
-
-    return -1;
+    return 0;
 }
