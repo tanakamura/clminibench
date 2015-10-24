@@ -2,6 +2,7 @@
 #include "CLlib.h"
 #include <dlfcn.h>
 #include <android/log.h>
+#include <unistd.h>
 
 
 #define  LOG_TAG    "libclminibench"
@@ -10,14 +11,29 @@
 
 static void *handle;
 
+static void *
+test_and_dlopen(const char *path)
+{
+    if (access(path,F_OK) == 0) {
+        return dlopen(path, RTLD_LAZY);
+    }
+
+    return NULL;
+}
+
 int
 cllib_init(void)
 {
     /* g620s */
-    handle = dlopen("/system/vendor/lib/libOpenCL.so", RTLD_LAZY);
+    handle = test_and_dlopen("/system/vendor/lib/libOpenCL.so");
     if (!handle) {
         /* nexus 10 */
-        handle = dlopen("/system/vendor/lib/egl/libGLES_mali.so", RTLD_LAZY);
+        handle = test_and_dlopen("/system/vendor/lib/egl/libGLES_mali.so");
+    }
+
+    if (!handle) {
+        /* Zenfone2 */
+        handle = test_and_dlopen("/system/vendor/lib/libPVROCL.so");
     }
 
     if (!handle) {

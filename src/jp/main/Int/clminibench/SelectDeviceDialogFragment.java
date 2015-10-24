@@ -1,6 +1,6 @@
 package jp.main.Int.clminibench;
 
-import com.example.clminibench.R;
+import main.jp.Int.clminibench.R;
 import android.content.DialogInterface;
 import android.support.v4.app.DialogFragment;
 import android.app.Dialog;

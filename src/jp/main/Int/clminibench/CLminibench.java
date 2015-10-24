@@ -6,7 +6,7 @@ public class CLminibench {
 
     static {
 	//System.load("/system/vendor/lib/egl/libGLES_mali.so");
-        System.load("/system/vendor/lib/libOpenCL.so");
+        //System.load("/system/vendor/lib/libOpenCL.so");
 	System.loadLibrary("clminibench");
     }
 
