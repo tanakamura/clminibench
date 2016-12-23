@@ -10,6 +10,7 @@ extern "C" {
 typedef LARGE_INTEGER timeval_t;
 #else
 #include <unistd.h>
+#include <sys/time.h>
 typedef struct timeval timeval_t;
 #endif
 

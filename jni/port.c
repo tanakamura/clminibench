@@ -39,7 +39,7 @@ aligned_free(void *p)
 
 #else
 #include <unistd.h>
-
+#include <malloc.h>
 
 void
 timeval_get(timeval_t *t)
